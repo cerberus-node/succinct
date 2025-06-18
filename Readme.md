@@ -1,4 +1,4 @@
-# Build Succinct Prover
+# Build Succinct Prover ( Build from source )
 
 You have **two installation options**:
 
