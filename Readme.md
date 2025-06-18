@@ -9,7 +9,7 @@ You have **two installation options**:
 If you want everything set up automatically, run the following command:
 
 ```bash
-curl -sL https://raw.githubusercontent.com/cerberus-node/succinct/refs/heads/main/auto-install.sh -o auto-install.sh && chmod +x auto-install.sh && bash auto-install.sh --clean
+curl -sL https://raw.githubusercontent.com/cerberus-node/succinct/refs/heads/main/auto-install.sh -o auto-install.sh && chmod +x auto-install.sh && bash auto-install.sh
 ```
 
 > ✅ This script installs Docker, Rust, Foundry, SP1 CLI, and builds the prover. Below is the image when you successfully run Auto-Script, at this step you just need to wait for it to calculate and when it finishes calculating, just run directly to step 9 and start with "Set Environment Variables".
