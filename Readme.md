@@ -14,6 +14,8 @@ curl -sL https://raw.githubusercontent.com/cerberus-node/succinct/refs/heads/mai
 
 > ✅ This script installs Docker, Rust, Foundry, SP1 CLI, and builds the prover. Below is the image when you successfully run Auto-Script, at this step you just need to wait for it to calculate and when it finishes calculating, just run directly to step 9 and start with "Set Environment Variables".
 
+![image](https://github.com/user-attachments/assets/2f8d7cb3-2b63-4998-90ff-f41a2cc76fef)
+
 ---
 
 ## II. Manual Installation (Step-by-Step)
