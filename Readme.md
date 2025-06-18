@@ -1,54 +1,77 @@
-# 🚀 Build Succinct Prover from Source
+# Build Succinct Prover
 
-## ✅ System Requirements
+You have **two installation options**:
 
-Make sure your GPU-enabled VPS can run Docker. Install Docker with the following steps:
+---
+
+## 🚀 Option A: Automatic Installation (Recommended for Beginners)
+
+If you want everything set up automatically, just run the following command:
 
 ```bash
-# Add Docker's official GPG key:
+curl -sL https://raw.githubusercontent.com/cerberus-node/succinct/refs/heads/main/auto-install.sh -o auto-install.sh  && chmod +x auto-install.sh  && bash auto-install.sh
+```
+
+This script installs Docker, NVIDIA drivers, CUDA tools, Rust, Foundry, SP1 CLI, and builds the prover.
+
+> ✅ If you use this method, you can skip directly to **Step 9: Run Prover with Calibration** below. All previous steps are handled automatically.
+
+## 🛠 Option B: Manual Installation (Step-by-Step)
+
+Follow the steps below if you prefer full control or want to understand each component.
+
+## 1. System Requirements Check
+
+If your system already has Docker installed and `nvidia-smi` shows a compatible CUDA version (12.5 or higher), skip to **Step 2: Install Rust**.
+
+### Check Existing Setup
+
+```bash
+# Check Docker
+docker --version
+
+# Check NVIDIA GPU and CUDA
+nvidia-smi
+
+> ✅ CUDA Version must be **12.5 or higher** to run the prover correctly.  
+> ⚠️ Driver Version is flexible, but it's recommended to use **555.xx.xx or newer** for best compatibility.
+```
+
+### If Not Installed Yet — Set Up Docker
+
+```bash
 sudo apt-get update
 sudo apt-get install ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
 
-# Add Docker repository:
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
   $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
-
-# Install Docker components:
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
 
-Before anything else, make sure your system is ready for NVIDIA GPU usage:
+### Set Up NVIDIA Driver & CUDA
 
 ```bash
 sudo apt update
 sudo apt install -y build-essential linux-headers-$(uname -r)
-
-# Check available GPU drivers
 ubuntu-drivers list --gpgpu
-
-# Install recommended GPU driver (example: nvidia-driver-575)
 sudo ubuntu-drivers install --gpgpu nvidia-driver-575
-
-# Install CUDA-compatible utilities
 sudo apt install -y nvidia-utils-575
-
-# Reboot your system
 sudo reboot
 ```
 
-After reboot, confirm your GPU is detected:
+After reboot:
 
 ```bash
 nvidia-smi
 ```
 
-Recommended output (CUDA-compatible):
+Expect output:
 
 ```
 NVIDIA-SMI 575.51.03
@@ -56,17 +79,9 @@ Driver Version: 575.51.03
 CUDA Version: 12.9
 ```
 
-If your `CUDA Version` is incompatible, please upgrade your driver accordingly before continuing.
+---
 
-Install required dependencies:
-
-```bash
-sudo apt update && sudo apt install -y \
-    curl git pkg-config libssl-dev build-essential \
-    libclang-dev cmake protobuf-compiler
-```
-
-## 🦀 Install Rust
+## 2. Install Rust
 
 ```bash
 curl https://sh.rustup.rs -sSf | sh
@@ -74,88 +89,60 @@ source $HOME/.cargo/env
 rustup update
 ```
 
-## 🔧 Install Foundry
-
-Foundry is required for building the prover node:
+## 3. Install Foundry
 
 ```bash
 curl -L https://foundry.paradigm.xyz | bash
 foundryup
-foundryup -i nightly  # optional: latest nightly version
+foundryup -i nightly
 ```
 
-## 📦 Install SP1 CLI
-
-SP1 is a CLI tool required for proving. It is **not** where you build the prover node.
+## 4. Install SP1 CLI (Proving Tool)
 
 ```bash
 cargo install --git https://github.com/succinctlabs/sp1 --locked sp1
-```
-
-To verify SP1 is installed:
-
-```bash
 sp1 --help
 ```
 
-## 🔄 Clone the Network Repository
-
-Clone the actual prover node code:
+## 5. Clone the Network Repository
 
 ```bash
 git clone https://github.com/succinctlabs/network.git
 cd network
 ```
 
-## 🛠 Build `spn-node`
-
-Go into the following directory:
+## 6. Build `spn-node`
 
 ```bash
 cd bin/node
-```
-
-Then run:
-
-```bash
 RUSTFLAGS="-C target-cpu=native" cargo build --release
 ```
 
-## ▶️ Verify the Build
-
-Return to the `network` root directory and run:
+## 7. Verify the Build
 
 ```bash
+cd ../../
 ./target/release/spn-node --version
 ```
 
-## 🐳 Build Docker Images
+## 8. Build Docker Image
 
-From inside the `network/` directory:
-
-**For CPU:**
+To run the prover in GPU mode, you must build the Docker image:
 
 ```bash
-docker build --target cpu -t spn-node:latest-cpu .
-```
-
-**For GPU:**
-
-```bash
+# GPU version
 docker build --target gpu -t spn-node:latest-gpu .
 ```
 
-### ✅ Test the Docker Image
-
-Still inside `network/`, run:
+### Test the Docker Image
 
 ```bash
-docker run spn-node:latest-cpu --version
+docker run spn-node:latest-gpu --version
 ```
 
-## 🎯 Run Prover with Calibration & Environment Variables (GPU Mode)
+## 9. Run Prover with Calibration (GPU Mode)
 
-First, calibrate your setup using:
+### Calibrate Your GPU
 
 ```bash
 SP1_PROVER=cuda ./target/release/spn-node calibrate \
@@ -165,7 +152,7 @@ SP1_PROVER=cuda ./target/release/spn-node calibrate \
     --prove-price 1.00
 ```
 
-Then set the following environment variables:
+### Set Environment Variables
 
 ```bash
 export PGUS_PER_SECOND=<PGUS_PER_SECOND>
@@ -174,7 +161,7 @@ export PROVER_ADDRESS=<PROVER_ADDRESS>
 export PRIVATE_KEY=<PRIVATE_KEY>
 ```
 
-Finally, run the Prover:
+### Run the Prover
 
 ```bash
 SP1_PROVER=cuda ./target/release/spn-node prove \
@@ -185,19 +172,21 @@ SP1_PROVER=cuda ./target/release/spn-node prove \
     --prover $PROVER_ADDRESS
 ```
 
-⚠️ **Important Notes:**
+---
 
-> * `RUSTFLAGS="-C target-cpu=native" cargo build --release` is the only command run in `bin/node`
-> * All other commands (`spn-node --version`, `docker build`, `docker run`) must be run from the root `network/` directory
-> * `sp1` is a separate CLI tool required for proving but unrelated to node building
-> * Foundry must be installed before building the node
+## 🔎 Notes
+
+* Only `cargo build` is run inside `bin/node`
+* All other commands are run from the root of the `network` folder
+* SP1 CLI is required for proving but unrelated to node build
+* Foundry must be installed before building node
 
 ---
 
-> ℹ️ **Reference:** For advanced options or troubleshooting, visit the official docs:
->
-> * [Build from Source](https://docs.succinct.xyz/docs/provers/installation/build-from-source)
-> * [SP1 Installation Guide](https://docs.succinct.xyz/docs/sp1/getting-started/install)
-> * [Foundry Docs](https://getfoundry.sh/)
+## 📚 References
+
+* [Build from Source](https://docs.succinct.xyz/docs/provers/installation/build-from-source)
+* [SP1 Installation Guide](https://docs.succinct.xyz/docs/sp1/getting-started/install)
+* [Foundry Docs](https://getfoundry.sh/)
 
 ---
