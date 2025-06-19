@@ -167,9 +167,10 @@ Calibration Results:
 ```bash
 export PGUS_PER_SECOND=391817
 export PROVE_PER_BPGU=1.25
-export PROVER_ADDRESS=<YOUR_WL_ADDRESS>  # The wallet that received 1000 $PROVE
-export PRIVATE_KEY=<PRIVATE_KEY>         # Private key of that wallet
+export PROVER_ADDRESS=<YOUR_WL_ADDRESS>   # The wallet after you stake, your Prover wallet 
+export PRIVATE_KEY=<PRIVATE_KEY>      # The wallet that received 1000 $PROVE
 ```
+![image](https://github.com/user-attachments/assets/687eb700-36ab-409e-8231-4dca23c2e048)
 
 #### Run the Prover (in tmux recommended)
 
@@ -185,7 +186,7 @@ export PRIVATE_KEY=<PRIVATE_KEY>         # Private key of that wallet
 
 ```bash
 SP1_PROVER=cuda ./target/release/spn-node prove \
-    --rpc-url https://rpc-production.succinct.xyz \
+    --rpc-url https://rpc.sepolia.succinct.xyz \
     --throughput $PGUS_PER_SECOND \
     --bid $PROVE_PER_BPGU \
     --private-key $PRIVATE_KEY \
