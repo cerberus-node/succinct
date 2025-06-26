@@ -25,7 +25,7 @@ When you run `docker ps`, look for these **COMMAND** entries:
   ![image](https://github.com/user-attachments/assets/a6d03877-2a52-4014-b999-7322502065bc)
 
 
-If you see these commands, **your node is running correctly!** You can safely exit tmux.
+If you see these commands, **your node is running correctly!** You can safely turn off ur PC.
 
 **Note: Don't press Ctrl+C to stop the running log.**
 
