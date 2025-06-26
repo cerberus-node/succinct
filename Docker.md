@@ -1,5 +1,9 @@
 # 🚀 Succinct Prover Node - Docker Installation & Usage Guide
 
+- This script is built on a version previously written by Yinger it works the same way [0xCRASHOUT - Guide](https://gist.github.com/0xCRASHOUT/6656b9418018c3657e612c34ae1546fd)
+- In this doc, I’ll focus more on detailed issues, execution commands, and related tools so you can better manage your Provers.
+- Big thanks to Yinger 🐐
+
 ## 📋 Table of Contents
 - [Prerequisites](#-prerequisites)
 - [System Requirements](#-system-requirements)
