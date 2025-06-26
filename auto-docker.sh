@@ -50,7 +50,17 @@ readonly NC='\033[0m' # No Color
 
 # Initialize logging
 init_logging() {
-    mkdir -p "$(dirname "$LOG_FILE")"
+    # Create log directory with appropriate permissions
+    if [ ! -d "$(dirname "$LOG_FILE")" ]; then
+        ${SUDO_CMD:-} mkdir -p "$(dirname "$LOG_FILE")"
+    fi
+    
+    # Ensure log file is writable
+    if [ ! -f "$LOG_FILE" ]; then
+        ${SUDO_CMD:-} touch "$LOG_FILE"
+        ${SUDO_CMD:-} chmod 666 "$LOG_FILE"
+    fi
+    
     exec 1> >(tee -a "$LOG_FILE")
     exec 2> >(tee -a "$LOG_FILE" >&2)
     log_info "Succinct Prover Setup v${SCRIPT_VERSION} - Session started: $(date)"
@@ -131,10 +141,26 @@ trap cleanup EXIT INT TERM
 validate_system() {
     log_step "Validating system requirements"
     
-    # Check if running as root
+    # Check if running as root or with sudo access
     if [ "$EUID" -ne 0 ]; then
-        log_error "This script must be run as root. Please use: sudo $SCRIPT_NAME"
-        return 1
+        log_info "Script not running as root, checking sudo access..."
+        
+        # Test sudo access
+        if sudo -n true 2>/dev/null; then
+            log_info "✓ Sudo access confirmed"
+        elif sudo -v 2>/dev/null; then
+            log_info "✓ Sudo access granted after password prompt"
+        else
+            log_error "This script requires root privileges. Please run with: sudo $SCRIPT_NAME"
+            log_error "Or ensure your user ($(whoami)) has sudo access"
+            return 1
+        fi
+        
+        # Set sudo prefix for commands
+        export SUDO_CMD="sudo"
+    else
+        log_info "✓ Running as root user"
+        export SUDO_CMD=""
     fi
     
     # Check operating system
@@ -241,13 +267,13 @@ update_system() {
     export DEBIAN_FRONTEND=noninteractive
     
     # Update package lists
-    if ! apt-get update; then
+    if ! $SUDO_CMD apt-get update; then
         log_error "Failed to update package lists"
         return 1
     fi
     
     # Upgrade packages
-    if ! apt-get upgrade -y; then
+    if ! $SUDO_CMD apt-get upgrade -y; then
         log_error "Failed to upgrade system packages"
         return 1
     fi
@@ -269,47 +295,48 @@ install_docker() {
     
     # Install prerequisites
     log_info "Installing Docker prerequisites"
-    if ! apt-get install -y apt-transport-https ca-certificates curl software-properties-common gnupg lsb-release; then
+    if ! $SUDO_CMD apt-get install -y apt-transport-https ca-certificates curl software-properties-common gnupg lsb-release; then
         log_error "Failed to install Docker prerequisites"
         return 1
     fi
     
     # Add Docker's official GPG key
     log_info "Adding Docker's GPG key"
-    if ! curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg; then
+    if ! curl -fsSL https://download.docker.com/linux/ubuntu/gpg | $SUDO_CMD gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg; then
         log_error "Failed to add Docker's GPG key"
         return 1
     fi
     
     # Add Docker repository
     log_info "Adding Docker repository"
-    if ! echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null; then
+    if ! echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | $SUDO_CMD tee /etc/apt/sources.list.d/docker.list > /dev/null; then
         log_error "Failed to add Docker repository"
         return 1
     fi
     
     # Update package lists
-    if ! apt-get update; then
+    if ! $SUDO_CMD apt-get update; then
         log_error "Failed to update package lists after adding Docker repository"
         return 1
     fi
     
     # Install Docker
     log_info "Installing Docker CE packages"
-    if ! apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin; then
+    if ! $SUDO_CMD apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin; then
         log_error "Failed to install Docker packages"
         return 1
     fi
     
     # Start and enable Docker service
     log_info "Configuring Docker service"
-    systemctl start docker
-    systemctl enable docker
+    $SUDO_CMD systemctl start docker
+    $SUDO_CMD systemctl enable docker
     
     # Add user to docker group
-    if [ -n "${SUDO_USER:-}" ]; then
-        usermod -aG docker "$SUDO_USER"
-        log_info "Added user '$SUDO_USER' to docker group"
+    local current_user="${SUDO_USER:-$(whoami)}"
+    if [ -n "$current_user" ] && [ "$current_user" != "root" ]; then
+        $SUDO_CMD usermod -aG docker "$current_user"
+        log_info "Added user '$current_user' to docker group"
     fi
     
     # Verify Docker installation
@@ -337,27 +364,27 @@ install_nvidia_toolkit() {
     
     # Add NVIDIA repository
     log_info "Setting up NVIDIA Container Toolkit repository"
-    if ! curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg; then
+    if ! curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | $SUDO_CMD gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg; then
         log_error "Failed to add NVIDIA GPG key"
         return 1
     fi
     
     if ! curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
         sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
-        tee /etc/apt/sources.list.d/nvidia-container-toolkit.list > /dev/null; then
+        $SUDO_CMD tee /etc/apt/sources.list.d/nvidia-container-toolkit.list > /dev/null; then
         log_error "Failed to add NVIDIA repository"
         return 1
     fi
     
     # Update package lists
-    if ! apt-get update; then
+    if ! $SUDO_CMD apt-get update; then
         log_error "Failed to update package lists after adding NVIDIA repository"
         return 1
     fi
     
     # Install NVIDIA Container Toolkit
     log_info "Installing NVIDIA Container Toolkit packages"
-    if ! apt-get install -y \
+    if ! $SUDO_CMD apt-get install -y \
         nvidia-container-toolkit="${NVIDIA_TOOLKIT_VERSION}" \
         nvidia-container-toolkit-base="${NVIDIA_TOOLKIT_VERSION}" \
         libnvidia-container-tools="${NVIDIA_TOOLKIT_VERSION}" \
@@ -368,13 +395,13 @@ install_nvidia_toolkit() {
     
     # Configure Docker runtime
     log_info "Configuring Docker for NVIDIA runtime"
-    if ! nvidia-ctk runtime configure --runtime=docker; then
+    if ! $SUDO_CMD nvidia-ctk runtime configure --runtime=docker; then
         log_error "Failed to configure NVIDIA runtime for Docker"
         return 1
     fi
     
     # Restart Docker service
-    systemctl restart docker
+    $SUDO_CMD systemctl restart docker
     
     log_success "NVIDIA Container Toolkit installed and configured"
     return 0
@@ -391,32 +418,32 @@ install_nvidia_drivers() {
     
     # Install build essentials
     log_info "Installing build essentials"
-    if ! apt-get install -y build-essential linux-headers-$(uname -r) dkms; then
+    if ! $SUDO_CMD apt-get install -y build-essential linux-headers-$(uname -r) dkms; then
         log_error "Failed to install build essentials"
         return 1
     fi
     
     # Remove conflicting drivers
     log_info "Removing existing NVIDIA installations"
-    apt-get remove -y nvidia-* --purge || true
-    apt-get autoremove -y || true
+    $SUDO_CMD apt-get remove -y nvidia-* --purge || true
+    $SUDO_CMD apt-get autoremove -y || true
     
     # Add NVIDIA CUDA repository
     log_info "Adding NVIDIA CUDA repository"
     wget -O "$TEMP_DIR/cuda-keyring.deb" https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb
-    if ! dpkg -i "$TEMP_DIR/cuda-keyring.deb"; then
+    if ! $SUDO_CMD dpkg -i "$TEMP_DIR/cuda-keyring.deb"; then
         log_error "Failed to install CUDA keyring"
         return 1
     fi
     
-    if ! apt-get update; then
+    if ! $SUDO_CMD apt-get update; then
         log_error "Failed to update package lists after adding CUDA repository"
         return 1
     fi
     
     # Install NVIDIA drivers
     log_info "Installing NVIDIA drivers and CUDA"
-    if ! apt-get install -y cuda-drivers; then
+    if ! $SUDO_CMD apt-get install -y cuda-drivers; then
         log_error "Failed to install NVIDIA drivers"
         return 1
     fi
@@ -526,7 +553,7 @@ check_installation_status() {
     local nvidia_drivers_ok=false
     
     # Check Docker
-    if command -v docker &>/dev/null && systemctl is-active --quiet docker; then
+    if command -v docker &>/dev/null && $SUDO_CMD systemctl is-active --quiet docker; then
         docker_installed=true
         log_info "✓ Docker is installed and running"
     else
@@ -534,7 +561,7 @@ check_installation_status() {
     fi
     
     # Check NVIDIA Container Toolkit
-    if dpkg -l | grep -q nvidia-container-toolkit; then
+    if $SUDO_CMD dpkg -l | grep -q nvidia-container-toolkit; then
         nvidia_toolkit_installed=true
         log_info "✓ NVIDIA Container Toolkit is installed"
     else
