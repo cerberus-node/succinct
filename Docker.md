@@ -33,10 +33,10 @@
 | Component | Minimum | Recommended |
 |-----------|---------|-------------|
 | **GPU** | NVIDIA RTX 3090 | RTX 4090 or better |
-| **RAM** | 16GB | 23GB+ |
+| **RAM** | 16GB | 24GB+ |
 | **Storage** | 100GB SSD | 100GB NVMe SSD |
 | **CPU** | 8 cores | 16+ cores |
-| **Network** | 100 Mbps | 1 Gbps+ |
+| **Network** | 100 Mbps | 1 Gbps+ or 10 Gbps+ is better |
 
 ### Software Requirements
 | Software | Version | Notes |
