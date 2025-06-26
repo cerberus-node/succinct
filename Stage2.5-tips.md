@@ -8,6 +8,7 @@ Simply go into tmux and rerun Yin's script that'll fix the issue.
 wget -O setup.sh https://gist.githubusercontent.com/0xCRASHOUT/6656b9418018c3657e612c34ae1546fd/raw/setup.sh
 sudo bash setup.sh
 ```
+**Note: Don't press Ctrl+C to stop the running log.**
 
 Press `Ctrl+B` then `D` to exit tmux.
 
@@ -26,8 +27,6 @@ When you run `docker ps`, look for these **COMMAND** entries:
 
 
 If you see these commands, **your node is running correctly!** You can safely turn off ur PC.
-
-**Note: Don't press Ctrl+C to stop the running log.**
 
 ---
 
