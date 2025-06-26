@@ -22,6 +22,9 @@ When you run `docker ps`, look for these **COMMAND** entries:
 - `moongate-server`
 - `/app/spn-node prove...`
 
+  ![image](https://github.com/user-attachments/assets/a6d03877-2a52-4014-b999-7322502065bc)
+
+
 If you see these commands, **your node is running correctly!** You can safely exit tmux.
 
 **Note: Don't press Ctrl+C to stop the running log.**
