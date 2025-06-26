@@ -41,7 +41,7 @@
 ### Software Requirements
 | Software | Version | Notes |
 |----------|---------|-------|
-| **Ubuntu** | 20.04+ | LTS recommended |
+| **Ubuntu** | 22.04+ | LTS recommended |
 | **NVIDIA Driver** | 555+ | For CUDA 12.5+ support |
 | **Docker** | 20.10+ | Latest stable version |
 | **NVIDIA Container Toolkit** | 1.17.8+ | GPU container support |
@@ -57,12 +57,12 @@
 
 ### One-Command Setup (Recommended)
 ```bash
-wget -O - https://raw.githubusercontent.com/cerberus-node/succinct/main/auto-docker.sh | sudo bash
+wget -O - https://raw.githubusercontent.com/cerberus-node/succinct/main/auto-docker.sh | bash
 ```
 
 ### Alternative: Download & Run
 ```bash
-wget https://raw.githubusercontent.com/cerberus-node/succinct/main/auto-docker.sh && chmod +x auto-docker.sh && sudo ./auto-docker.sh
+wget https://raw.githubusercontent.com/cerberus-node/succinct/main/auto-docker.sh && chmod +x auto-docker.sh && ./auto-docker.sh
 ```
 
 ---
@@ -86,8 +86,8 @@ sha256sum auto-docker.sh
 
 ### Step 2: Run Installation Script
 ```bash
-# Execute with root privileges
-sudo ./auto-docker.sh
+# Execute the script (will auto-detect and use sudo when needed)
+./auto-docker.sh
 ```
 
 ### Step 3: Installation Flow
