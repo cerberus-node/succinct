@@ -71,8 +71,6 @@ wget https://raw.githubusercontent.com/cerberus-node/succinct/main/auto-docker.s
 
 ### Step 1: Download & Prepare Script
 ```bash
-# Navigate to your working directory
-cd /opt/succinct
 
 # Download the setup script from GitHub
 wget https://raw.githubusercontent.com/cerberus-node/succinct/main/auto-docker.sh
