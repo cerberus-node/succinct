@@ -1,15 +1,15 @@
 # 🚀 Succinct Prover Node - Docker Installation & Usage Guide
 
 ## 📋 Table of Contents
-- [Prerequisites](#prerequisites)
-- [System Requirements](#system-requirements)
-- [Quick Start](#quick-start)
-- [Detailed Setup Process](#detailed-setup-process)
-- [Manual Docker Configuration](#manual-docker-configuration)
-- [Troubleshooting](#troubleshooting)
-- [Advanced Configuration](#advanced-configuration)
-- [Monitoring & Maintenance](#monitoring--maintenance)
-- [Security Best Practices](#security-best-practices)
+- [Prerequisites](#-prerequisites)
+- [System Requirements](#-system-requirements)
+- [Quick Start](#-quick-start)
+- [Detailed Setup Process](#-detailed-setup-process)
+- [Manual Docker Configuration](#-manual-docker-configuration)
+- [Troubleshooting](#-troubleshooting)
+- [Advanced Configuration](#-advanced-configuration)
+- [Monitoring & Maintenance](#-monitoring--maintenance)
+- [Security Best Practices](#-security-best-practices)
 
 ---
 
@@ -55,18 +55,15 @@
 
 ## 🚀 Quick Start
 
-### Option 1: Automated Setup (Recommended)
+### One-Command Setup (Recommended)
 ```bash
-# Download and make executable
-wget https://your-script-url/Auto-docker.sh
-chmod +x Auto-docker.sh
-
-# Run automated setup
-sudo ./Auto-docker.sh
+wget -O - https://raw.githubusercontent.com/cerberus-node/succinct/main/auto-docker.sh | sudo bash
 ```
 
-### Option 2: Manual Setup
-Follow the [Detailed Setup Process](#detailed-setup-process) below.
+### Alternative: Download & Run
+```bash
+wget https://raw.githubusercontent.com/cerberus-node/succinct/main/auto-docker.sh && chmod +x auto-docker.sh && sudo ./auto-docker.sh
+```
 
 ---
 
@@ -77,20 +74,20 @@ Follow the [Detailed Setup Process](#detailed-setup-process) below.
 # Navigate to your working directory
 cd /opt/succinct
 
-# Download the setup script
-wget https://your-script-url/Auto-docker.sh
+# Download the setup script from GitHub
+wget https://raw.githubusercontent.com/cerberus-node/succinct/main/auto-docker.sh
 
 # Make it executable
-chmod +x Auto-docker.sh
+chmod +x auto-docker.sh
 
 # Verify script integrity (optional)
-sha256sum Auto-docker.sh
+sha256sum auto-docker.sh
 ```
 
 ### Step 2: Run Installation Script
 ```bash
 # Execute with root privileges
-sudo ./Auto-docker.sh
+sudo ./auto-docker.sh
 ```
 
 ### Step 3: Installation Flow
@@ -134,7 +131,7 @@ When prompted, provide:
 
 #### Prover Address
 ```
-Enter your Prover Address (0x...): 0x1234567890123456789012345678901234567890
+Enter your Prover Address (0x...): 0x000000000000000000000000000000000000000
 ```
 - **Format**: 0x followed by 40 hexadecimal characters
 - **Source**: "My Prover" page on staking portal
@@ -162,7 +159,7 @@ If you prefer manual setup or need custom configuration:
 # Core configuration
 export PROVE_PER_BPGU=1.01
 export PGUS_PER_SECOND=10485606
-export PROVER_ADDRESS="0x1234567890123456789012345678901234567890"
+export PROVER_ADDRESS="0x000000000000000000000000000000000000000"
 export PRIVATE_KEY="abc123def456..."
 
 # Network configuration
@@ -450,5 +447,3 @@ docker stop $(docker ps -q --filter ancestor=public.ecr.aws/succinct-labs/spn-no
 ---
 
 **💡 Pro Tip**: Always test your setup on a development environment before deploying to production. Keep your staking wallet secure and monitor your prover's performance regularly.
-
-For additional support, consult the official documentation or reach out to the Succinct community on Discord.
