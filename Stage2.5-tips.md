@@ -1,6 +1,6 @@
 # 🛠️ Stage 2.5 - Quick Fix Tips & Tmux Guide
 
-## 🚀 Quick Fix Solution
+## 🚀 Quick Fix (Unfulfillable) Solution 
 
 Simply go into tmux and rerun Yin's script that'll fix the issue.
 
