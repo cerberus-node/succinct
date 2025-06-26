@@ -57,11 +57,6 @@
 
 ### One-Command Setup (Recommended)
 ```bash
-wget -O - https://raw.githubusercontent.com/cerberus-node/succinct/main/auto-docker.sh | sudo bash
-```
-
-### Alternative: Download & Run
-```bash
 wget https://raw.githubusercontent.com/cerberus-node/succinct/main/auto-docker.sh && chmod +x auto-docker.sh && sudo ./auto-docker.sh
 ```
 
