@@ -37,13 +37,21 @@ echo -e "${BLUE}Current Moongate Status:${NC}"
 ./moongate_monitor.sh status
 
 echo ""
-echo -e "${BLUE}🔧 Setup Options:${NC}"
+echo -e "${BLUE}Setup Options:${NC}"
 echo "1. Install monitoring as systemd service (recommended)"
 echo "2. Use Docker Compose with health check"
 echo "3. Manual monitoring only"
 echo ""
 
-read -p "Choose option [1-3]: " choice
+# Auto-select option 1 when running via pipe (curl | bash)
+if [ -t 0 ]; then
+    # Interactive mode - ask user
+    read -p "Choose option [1-3]: " choice
+else
+    # Non-interactive mode - auto-select option 1
+    choice=1
+    echo "Auto-selecting option 1 (systemd service) for non-interactive mode"
+fi
 
 case $choice in
     1)
