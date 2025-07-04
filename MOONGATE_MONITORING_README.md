@@ -30,10 +30,10 @@ wget https://raw.githubusercontent.com/cerberus-node/succinct/main/moongate_moni
 wget https://raw.githubusercontent.com/cerberus-node/succinct/main/setup_moongate_monitoring_auto.sh
 
 # 2. Make executable (needed when downloading files)
-chmod +x moongate_monitor.sh setup_moongate_monitoring.sh
+chmod +x moongate_monitor.sh setup_moongate_monitoring_auto.sh
 
 # 3. Run setup
-sudo ./setup_moongate_monitoring.sh
+sudo ./setup_moongate_monitoring_auto.sh
 ```
 
 ## Verify Installation
