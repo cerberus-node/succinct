@@ -1,4 +1,4 @@
-# Moongate Health Monitoring for SP1 CUDA
+# Quick Start: Moongate Monitoring for SP1 CUDA
 
 ## Problem
 
@@ -13,117 +13,126 @@ Os { code: 111, kind: ConnectionRefused, message: "Connection refused" }))) })
 ```
 
 ## Solution
+Automated monitoring system that keeps moongate running 24/7.
 
-This monitoring system ensures moongate is always running:
-
-1. **Health Check**: Checks container and port 3000 every 30 seconds
-2. **Auto-restart**: Automatically restarts if service stops
-3. **Logging**: Detailed logging for troubleshooting
-4. **Notifications**: Alerts when issues occur
-
-## Files
-
-- `moongate_monitor.sh` - Main monitoring script
-- `setup_moongate_monitoring.sh` - Automatic setup script
-
-## Usage
-
-### 1. Automatic Setup (Recommended)
+## One-Command Setup
 
 ```bash
-# Run setup script
+# Download and run setup script (no chmod needed)
+curl -sSL https://raw.githubusercontent.com/cerberus-node/succinct/main/setup_moongate_monitoring_auto.sh | sudo bash
+```
+
+## Manual Setup (if curl doesn't work)
+
+```bash
+# 1. Download files
+wget https://raw.githubusercontent.com/cerberus-node/succinct/main/moongate_monitor.sh
+wget https://raw.githubusercontent.com/cerberus-node/succinct/main/setup_moongate_monitoring.sh
+
+# 2. Make executable (needed when downloading files)
+chmod +x moongate_monitor.sh setup_moongate_monitoring.sh
+
+# 3. Run setup
 sudo ./setup_moongate_monitoring.sh
-
-# Choose option 1 (systemd service)
 ```
 
-### 2. Systemd Service (Auto-start on boot)
-
-```bash
-# Install service
-sudo ./moongate_monitor.sh install
-
-# Check status
-sudo systemctl status moongate-monitor
-
-# View real-time logs
-sudo journalctl -u moongate-monitor -f
-
-# Stop/start service
-sudo systemctl stop moongate-monitor
-sudo systemctl start moongate-monitor
-```
-
-### 3. Manual Commands
-
-```bash
-# Check status
-./moongate_monitor.sh status
-
-# Run health check
-./moongate_monitor.sh check
-
-# Start/restart moongate
-./moongate_monitor.sh start
-
-# Run monitoring in background
-./moongate_monitor.sh monitor &
-```
-
-## Monitoring Dashboard
-
-### Check real-time status:
-```bash
-watch './moongate_monitor.sh status'
-```
-
-### View logs:
-```bash
-# Monitoring logs
-tail -f /var/log/moongate_monitor.log
-
-# Container logs
-docker logs sp1-gpu -f
-```
-
-## Troubleshooting
-
-### 1. Moongate won't start
-
-```bash
-# Check GPU availability
-nvidia-smi
-
-# Check Docker GPU access
-docker run --rm --gpus all nvidia/cuda:11.0-base nvidia-smi
-
-# View detailed logs
-docker logs sp1-gpu
-```
-
-### 2. Port 3000 is occupied
-
-```bash
-# Check process using port 3000
-sudo netstat -tulpn | grep :3000
-
-# Kill other process if needed
-sudo kill -9 <PID>
-```
-
-### 3. Monitoring service not working
+## Verify Installation
 
 ```bash
 # Check service status
 sudo systemctl status moongate-monitor
 
-# Restart service
-sudo systemctl restart moongate-monitor
+# Check moongate status
+./moongate_monitor.sh status
 
-# View error logs
-sudo journalctl -u moongate-monitor --since "1 hour ago"
+# Test connection
+nc -z localhost 3000 && echo "SUCCESS: Port 3000 accessible" || echo "ERROR: Port 3000 not accessible"
 ```
 
+## Monitor Logs
+
+```bash
+# View monitoring logs
+sudo journalctl -u moongate-monitor -f
+
+# View moongate logs
+docker logs sp1-gpu -f
+```
+
+## Test Auto-Restart
+
+```bash
+# Stop moongate to test auto-restart
+docker stop sp1-gpu
+
+# Wait 30 seconds
+sleep 30
+
+# Check if it restarted
+docker ps | grep moongate
+```
+
+## Usage Commands
+
+```bash
+# Check status
+./moongate_monitor.sh status
+
+# Manual health check
+./moongate_monitor.sh check
+
+# Restart moongate
+./moongate_monitor.sh start
+
+# Stop monitoring service
+sudo systemctl stop moongate-monitor
+
+# Start monitoring service
+sudo systemctl start moongate-monitor
+```
+
+## Result
+- SP1 CUDA will no longer get "connection refused" errors
+- Moongate automatically restarts if it stops
+- 24/7 monitoring without manual intervention
+- Service starts automatically on system boot
+
+## Troubleshooting
+
+If you see "connection refused" errors:
+
+```bash
+# 1. Check if monitoring is running
+sudo systemctl status moongate-monitor
+
+# 2. Check moongate status
+./moongate_monitor.sh status
+
+# 3. Restart monitoring
+sudo systemctl restart moongate-monitor
+
+# 4. Check logs
+sudo journalctl -u moongate-monitor --since "10 minutes ago"
+```
+
+## Files Created
+- `/etc/systemd/system/moongate-monitor.service` - Systemd service
+- `/var/log/moongate_monitor.log` - Monitoring logs
+- `moongate_monitor.sh` - Monitoring script
+
+## Uninstall
+
+```bash
+# Stop and disable service
+sudo systemctl stop moongate-monitor
+sudo systemctl disable moongate-monitor
+
+# Remove service file
+sudo rm /etc/systemd/system/moongate-monitor.service
+
+# Reload systemd
+sudo systemctl daemon-reload
+``` 
 ## Health Check Details
 
 Service performs these checks:
