@@ -27,7 +27,7 @@ curl -sSL https://raw.githubusercontent.com/cerberus-node/succinct/main/setup_mo
 ```bash
 # 1. Download files
 wget https://raw.githubusercontent.com/cerberus-node/succinct/main/moongate_monitor.sh
-wget https://raw.githubusercontent.com/cerberus-node/succinct/main/setup_moongate_monitoring.sh
+wget https://raw.githubusercontent.com/cerberus-node/succinct/main/setup_moongate_monitoring_auto.sh
 
 # 2. Make executable (needed when downloading files)
 chmod +x moongate_monitor.sh setup_moongate_monitoring.sh
