@@ -63,12 +63,12 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 #### Install NVIDIA Driver & CUDA
 
 ```bash
-sudo apt update
-sudo apt install -y build-essential linux-headers-$(uname -r)
-sudo apt install ubuntu-drivers-common
-ubuntu-drivers list --gpgpu
-sudo ubuntu-drivers install --gpgpu nvidia-driver-575
-sudo apt install -y nvidia-utils-575
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb
+sudo dpkg -i cuda-keyring_1.1-1_all.deb
+sudo apt-get update
+sudo apt-get -y install cuda-toolkit-12-9
+
+#Reboot
 sudo reboot
 ```
 
