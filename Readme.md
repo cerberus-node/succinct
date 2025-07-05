@@ -65,6 +65,7 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 ```bash
 sudo apt update
 sudo apt install -y build-essential linux-headers-$(uname -r)
+sudo apt install ubuntu-drivers-common
 ubuntu-drivers list --gpgpu
 sudo ubuntu-drivers install --gpgpu nvidia-driver-575
 sudo apt install -y nvidia-utils-575
