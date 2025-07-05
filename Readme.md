@@ -63,12 +63,26 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 #### Install NVIDIA Driver & CUDA
 
 ```bash
-wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb
-sudo dpkg -i cuda-keyring_1.1-1_all.deb
+# 1. (Optional) Add the NVIDIA drivers PPA and update apt
+sudo add-apt-repository ppa:graphics-drivers/ppa
 sudo apt-get update
-sudo apt-get -y install cuda-toolkit-12-9
 
-#Reboot
+# 2. Install prerequisites for DKMS module builds
+sudo apt-get install -y build-essential dkms linux-headers-$(uname -r)
+
+# 3. Remove any old NVIDIA/CUDA 550-series packages
+sudo apt-get remove --purge 'nvidia-*550*'
+sudo apt-get autoremove --purge
+
+# 4. Clean up and fix any broken dependencies
+sudo apt-get clean
+sudo apt-get update
+sudo apt-get install -f
+
+# 5. Install the NVIDIA 570-server driver (CUDA 12.5+ support)
+sudo apt-get install -y nvidia-driver-570-server
+
+# 6. Reboot so the new driver modules are loaded
 sudo reboot
 ```
 
